@@ -24,6 +24,7 @@
 #include "util.h"
 #include "utilmoneystr.h"
 #include "validationinterface.h"
+#include "base58.h"
 
 #include <boost/thread.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -354,17 +355,23 @@ void static BitcoinMiner(const CChainParams& chainparams)
     unsigned int nExtraNonce = 0;
 
     boost::shared_ptr<CReserveScript> coinbaseScript;
-    GetMainSignals().ScriptForMining(coinbaseScript);
+    
+    std::string coinbase_addr = GetArg("-coinbase_addr", "");
+    if (coinbase_addr.empty()) {
+        GetMainSignals().ScriptForMining(coinbaseScript);
+    }     
 
     try {
         // Throw an error if no script was provided.  This can happen
         // due to some internal error but also if the keypool is empty.
         // In the latter case, already the pointer is NULL.
-        if (!coinbaseScript || coinbaseScript->reserveScript.empty())
-            throw std::runtime_error("No coinbase script available (mining requires a wallet)");
+        if ((!coinbaseScript || coinbaseScript->reserveScript.empty())
+                && (coinbase_addr.empty()))
+            throw std::runtime_error("No coinbase script available (mining requires a wallet)"
+                " and no coinbase address in config file");
 
         while (true) {
-            std::cout << "dispatcher ip is " << GetArg("-dispatcher_ip", "no_ip")<< std::endl;
+            std::cout << "dispatcher ip is " << GetArg("-dispatcher_ip", "")<< std::endl;
             std::cout << "dispatcher port is " << GetArg("-dispatcher_port", 5556)<< std::endl;
             MilliSleep(10000);
             if (chainparams.MiningRequiresPeers()) {
@@ -388,7 +395,17 @@ void static BitcoinMiner(const CChainParams& chainparams)
             unsigned int nTransactionsUpdatedLast = mempool.GetTransactionsUpdated();
             CBlockIndex* pindexPrev = chainActive.Tip();
 
-            auto_ptr<CBlockTemplate> pblocktemplate(CreateNewBlock(chainparams, coinbaseScript->reserveScript));
+            CKeyID keyid;
+            if (!coinbase_addr.empty()) {
+                CBitcoinAddress ba(coinbase_addr);
+                if (!ba.GetKeyID(keyid)) {
+                    throw std::runtime_error("Invalid coinbase address in config file.");
+                }
+            }
+
+            auto_ptr<CBlockTemplate> pblocktemplate(CreateNewBlock(chainparams, 
+                coinbase_addr.empty()? coinbaseScript->reserveScript :  
+                    CScript() << OP_DUP << OP_HASH160 << ToByteVector(keyid) << OP_EQUALVERIFY << OP_CHECKSIG));
             if (!pblocktemplate.get())
             {
                 LogPrintf("Error in BitcoinMiner: Keypool ran out, please call keypoolrefill before restarting the mining thread\n");
@@ -417,7 +434,7 @@ void static BitcoinMiner(const CChainParams& chainparams)
                     LogPrintf("proof-of-work found  \n  hash: %s  \ntarget: %s\n", hash.GetHex(), hashTarget.GetHex());
                     ProcessBlockFound(pblock, chainparams);
                     SetThreadPriority(THREAD_PRIORITY_LOWEST);
-                    coinbaseScript->KeepScript();
+                    //coinbaseScript->KeepScript();
 
                     // In regression test mode, stop mining after a block is found.
                     if (chainparams.MineBlocksOnDemand())
