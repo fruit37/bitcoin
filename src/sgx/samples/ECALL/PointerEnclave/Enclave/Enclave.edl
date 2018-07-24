@@ -1,0 +1,9 @@
+enclave {
+
+    //Testing on trusted ecall available for application
+    trusted {
+		//using out, everything pointed by ptr will first be deleted, and it is only used to store the return value of pointer function.
+		public void pointer([out] int* ptr);
+    };    
+
+};

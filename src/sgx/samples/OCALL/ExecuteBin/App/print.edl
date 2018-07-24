@@ -1,0 +1,10 @@
+enclave {
+    //Testing on trusted ecall available for application
+    trusted {
+	public void callEnclaveToPrint(void);
+    };
+    //Testing on untrusted ocall
+    untrusted {
+        void printString([in, string] const char *str);
+    }; 
+};

@@ -1,0 +1,7 @@
+enclave {
+	from "print.edl" import *;
+	from "sgx_tprotected_fs.edl" import *;
+	trusted {
+		public void createNewFile(void);
+	};
+};

@@ -1,0 +1,8 @@
+enclave {
+
+    //Testing on trusted ecall available for application
+    trusted {
+	public int square([in] int* temp);
+    };    
+
+};

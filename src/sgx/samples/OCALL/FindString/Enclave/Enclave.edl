@@ -1,0 +1,10 @@
+enclave {
+    trusted {
+	   public int findOccurString([in, string] char *str, [in, string] char* word, [out] int* number);
+    };
+    //OCALL functions for output
+    untrusted {
+	   void print([in, string] const char *str);
+	   void printInt([in] const int *num);
+    };
+};

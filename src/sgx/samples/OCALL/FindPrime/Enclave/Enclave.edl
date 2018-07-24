@@ -1,0 +1,6 @@
+enclave {
+    //Testing on trusted ecall available for application
+    trusted {
+		public void calculatePrime(void);
+    };
+};
