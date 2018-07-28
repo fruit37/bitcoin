@@ -5,6 +5,24 @@ Bitcoin Core integration/staging tree
 
 https://bitcoincore.org
 
+Build steps
+-----------
+sudo apt install libdb++-dev pkg-config libevent-dev libboost-all-dev libjsoncpp
+
+./autogen.sh
+
+./configure --disable-tests --disable-bench --with-incompatible-bdb
+
+cd ./src/sgx
+
+cmake .
+
+make
+
+cd ../..
+
+make-j8
+
 What is Bitcoin?
 ----------------
 
