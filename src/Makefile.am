@@ -23,14 +23,13 @@ endif
 LIBPOUW_SGX_LDFLAGS = -L/opt/intel/sgxsdk/lib64 -lsgx_urts -lsgx_uae_service -L/usr/local/lib -lrestclient-cpp -lcrypto
 
 LIBPOUW_SGX = $(builddir)/sgx/libpouw.a
-# LIBPOUW_SGX = $(builddir)/sgx/pouw.a
 $(LIBPOUW_SGX): FORCE
 	@$(MAKE) -BC $(@D)
 	@cp -f $(builddir)/sgx/Enclave/enclave.signed.so .
 	@cp -f $(builddir)/sgx/Enclave/enclave.signed.so ..
 
 BITCOIN_CONFIG_INCLUDES=-I$(builddir)/config
-BITCOIN_INCLUDES=-I$(builddir) -I$(builddir)/obj $(BOOST_CPPFLAGS) $(LEVELDB_CPPFLAGS) $(CRYPTO_CFLAGS) $(SSL_CFLAGS)
+BITCOIN_INCLUDES=-I$(builddir) -I$(builddir)/obj $(BOOST_CPPFLAGS) $(LEVELDB_CPPFLAGS) $(CRYPTO_CFLAGS) $(SSL_CFLAGS) $(JSONCPP_FLAGS)
 
 BITCOIN_INCLUDES += -I$(srcdir)/secp256k1/include
 BITCOIN_INCLUDES += -I$(srcdir)/univalue/include
@@ -132,6 +131,7 @@ BITCOIN_CORE_H = \
   memusage.h \
   merkleblock.h \
   miner.h \
+  zmq.hpp \
   net.h \
   netbase.h \
   noui.h \
@@ -372,7 +372,7 @@ if ENABLE_WALLET
 bitcoind_LDADD += libbitcoin_wallet.a
 endif
 
-bitcoind_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS)
+bitcoind_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(JSONCPP_LIBS)
 
 # added by Fan
 bitcoind_LDADD += $(LIBPOUW_SGX) $(LIBPOUW_SGX_LDFLAGS)

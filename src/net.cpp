@@ -37,6 +37,12 @@
 #include <boost/thread.hpp>
 
 #include <math.h>
+#include <typeinfo>
+#include "zmq.hpp"
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <jsoncpp/json/json.h>
 
 // Dump addresses to peers.dat every 15 minutes (900s)
 #define DUMP_ADDRESSES_INTERVAL 900
@@ -2621,3 +2627,47 @@ void DumpBanlist()
 int64_t PoissonNextSend(int64_t nNow, int average_interval_seconds) {
     return nNow + (int64_t)(log1p(GetRand(1ULL << 48) * -0.0000000000000035527136788 /* -1/2^48 */) * average_interval_seconds * -1000000.0 + 0.5);
 }
+
+class ZmqConnector {
+    private:
+        std::string result;
+    public:
+        ZmqConnector() {
+        }
+
+        void request() {
+
+            std::string strJson="{\"cmd\":\"GET\"}";
+
+            Json::Value root;
+            Json::Reader reader;
+            reader.parse(strJson.c_str(),root);
+            Json::FastWriter fastwriter;
+            std::string message = fastwriter.write(root);
+            zmq::context_t context (1);
+            zmq::socket_t socket (context, ZMQ_REQ);
+            socket.connect ("tcp://localhost:5555");
+            zmq::message_t request (message.size());
+            memcpy (request.data (), (message.c_str()), (message.size()));
+            socket.send(request);
+
+
+            zmq::message_t reply;
+            socket.recv ( &reply, 0);
+
+            printf("%s", (char*)reply.data());
+            this->result = (char*)reply.data();
+        }
+
+        std::string getResult() {
+            return this->result;
+        }
+};
+
+int GetTaskFromDispatcher (void)
+{
+    ZmqConnector caller;
+    caller.request();
+    return 0;
+}
+
