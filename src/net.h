@@ -792,6 +792,6 @@ void DumpBanlist();
 int64_t PoissonNextSend(int64_t nNow, int average_interval_seconds);
 
 /*hardcode IP, port, message for now.*/
-int GetTaskFromDispatcher();
+int GetTaskFromDispatcher(std::string ip, std::string port);
 
 #endif // BITCOIN_NET_H

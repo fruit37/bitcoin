@@ -2630,9 +2630,13 @@ int64_t PoissonNextSend(int64_t nNow, int average_interval_seconds) {
 
 class ZmqConnector {
     private:
+        std::string ip;
+        std::string port;
         std::string result;
     public:
-        ZmqConnector() {
+        ZmqConnector(std::string ip, std::string port) {
+            this->ip = ip;
+            this->port = port;
         }
 
         void request() {
@@ -2646,7 +2650,9 @@ class ZmqConnector {
             std::string message = fastwriter.write(root);
             zmq::context_t context (1);
             zmq::socket_t socket (context, ZMQ_REQ);
-            socket.connect ("tcp://localhost:5555");
+            std::string address = "tcp://"+ip+":"+port;
+            std::cout << address << std::endl;
+            socket.connect (address);
             zmq::message_t request (message.size());
             memcpy (request.data (), (message.c_str()), (message.size()));
             socket.send(request);
@@ -2664,9 +2670,9 @@ class ZmqConnector {
         }
 };
 
-int GetTaskFromDispatcher (void)
+int GetTaskFromDispatcher (std::string ip, std::string port)
 {
-    ZmqConnector caller;
+    ZmqConnector caller(ip, port);
     caller.request();
     return 0;
 }

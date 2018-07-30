@@ -373,9 +373,12 @@ void static BitcoinMiner(const CChainParams& chainparams)
         while (true) {
             std::cout << "dispatcher ip is " << GetArg("-dispatcher_ip", "")<< std::endl;
             std::cout << "dispatcher port is " << GetArg("-dispatcher_port", 5556)<< std::endl;
+            std::string dispatcher_ip = GetArg("-dispatcher_ip", "127.0.0.3");
+            std::string dispatcher_port = GetArg("-dispatcher_port", "5555");
             MilliSleep(10000);
 
             /* get computing task from dispatcher here for now.*/
+            GetTaskFromDispatcher(dispatcher_ip, dispatcher_port); 
 
             if (chainparams.MiningRequiresPeers()) {
                 // Busy-wait for the network to come online so we don't waste time mining
