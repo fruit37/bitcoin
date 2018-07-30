@@ -2661,7 +2661,7 @@ class ZmqConnector {
             zmq::message_t reply;
             socket.recv ( &reply, 0);
 
-            printf("%s", (char*)reply.data());
+            //printf("%s", (char*)reply.data());
             this->result = (char*)reply.data();
         }
 
@@ -2670,10 +2670,11 @@ class ZmqConnector {
         }
 };
 
-int GetTaskFromDispatcher (std::string ip, std::string port)
+int GetTaskFromDispatcher (std::string ip, std::string port, std::string& result)
 {
     ZmqConnector caller(ip, port);
     caller.request();
+    result = caller.getResult();
     return 0;
 }
 

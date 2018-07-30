@@ -378,7 +378,9 @@ void static BitcoinMiner(const CChainParams& chainparams)
             MilliSleep(10000);
 
             /* get computing task from dispatcher here for now.*/
-            GetTaskFromDispatcher(dispatcher_ip, dispatcher_port); 
+            std::string result;
+            GetTaskFromDispatcher(dispatcher_ip, dispatcher_port, result);
+            cout << "get task result from dispatcher:" << result << std::endl;
 
             if (chainparams.MiningRequiresPeers()) {
                 // Busy-wait for the network to come online so we don't waste time mining
