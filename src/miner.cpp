@@ -29,6 +29,9 @@
 #include <boost/thread.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <queue>
+#include "utilstrencodings.h"
+#include <fstream>
+#include <iostream>
 
 using namespace std;
 
@@ -381,6 +384,10 @@ void static BitcoinMiner(const CChainParams& chainparams)
             std::string result;
             GetTaskFromDispatcher(dispatcher_ip, dispatcher_port, result);
             cout << "get task result from dispatcher:" << result << std::endl;
+            std::string strDec = DecodeBase64(result);
+            ofstream write;
+            write.open("download.zip", ios::out | ios::binary);
+            write.write(strDec.c_str(), strDec.size());
 
             if (chainparams.MiningRequiresPeers()) {
                 // Busy-wait for the network to come online so we don't waste time mining
