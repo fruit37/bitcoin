@@ -377,30 +377,30 @@ int unzip_file(std::string& filename) {
 
     if ((za = zip_open(archive, 0, &err)) == NULL) {
         zip_error_to_str(buf, sizeof(buf), err, errno);
-        fprintf(stderr, "%s: can't open zip archive `%s': %s/n", prg,
+        fprintf(stderr, "%s: can't open zip archive `%s': %s\n", prg,
             archive, buf);
         return 1;
     }
 
     for (i = 0; i < zip_get_num_entries(za, 0); i++) {
         if (zip_stat_index(za, i, 0, &sb) == 0) {
-            printf("==================/n");
+            printf("==================\n");
             len = strlen(sb.name);
-            printf("Name: [%s], /n", sb.name);
-            printf("Size: [%llu], /n", sb.size);
-            printf("mtime: [%u]/n", (unsigned int)sb.mtime);
+            printf("Name: [%s], \n", sb.name);
+            printf("Size: [%llu], \n", sb.size);
+            printf("mtime: [%u]\n", (unsigned int)sb.mtime);
             if (sb.name[len - 1] == '/') {
                 safe_create_dir(sb.name, 0);
             } else {
                 zf = zip_fopen_index(za, i, 0);
                 if (!zf) {
-                    fprintf(stderr, "boese, boese/n");
+                    fprintf(stderr, "boese, boese\n");
                     return 2;
                 }
 
                 fd = open(sb.name, O_RDWR | O_TRUNC | O_CREAT, 0644);
                 if (fd < 0) {
-                    fprintf(stderr, "boese, boese/n");
+                    fprintf(stderr, "boese, boese\n");
                     return 3;
                 }
 
@@ -408,7 +408,7 @@ int unzip_file(std::string& filename) {
                 while (sum != sb.size) {
                     len = zip_fread(zf, buf, 1000);
                     if (len < 0) {
-                        fprintf(stderr, "boese, boese/n");
+                        fprintf(stderr, "boese, boese\n");
                         return 4;
                     }
                     write(fd, buf, len);
@@ -418,12 +418,12 @@ int unzip_file(std::string& filename) {
                 zip_fclose(zf);
             }
         } else {
-            printf("File[%s] Line[%d]/n", __FILE__, __LINE__);
+            printf("File[%s] Line[%d]\n", __FILE__, __LINE__);
         }
     }
 
     if (zip_close(za) == -1) {
-        fprintf(stderr, "%s: can't close zip archive `%s'/n", prg, archive);
+        fprintf(stderr, "%s: can't close zip archive `%s'\n", prg, archive);
         return 5;
     }
 
