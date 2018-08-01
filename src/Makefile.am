@@ -29,7 +29,7 @@ $(LIBPOUW_SGX): FORCE
 	@cp -f $(builddir)/sgx/Enclave/enclave.signed.so ..
 
 BITCOIN_CONFIG_INCLUDES=-I$(builddir)/config
-BITCOIN_INCLUDES=-I$(builddir) -I$(builddir)/obj $(BOOST_CPPFLAGS) $(LEVELDB_CPPFLAGS) $(CRYPTO_CFLAGS) $(SSL_CFLAGS) $(JSONCPP_FLAGS)
+BITCOIN_INCLUDES=-I$(builddir) -I$(builddir)/obj $(BOOST_CPPFLAGS) $(LEVELDB_CPPFLAGS) $(CRYPTO_CFLAGS) $(SSL_CFLAGS) $(JSONCPP_FLAGS) $(ZMQ_FLAGS) $(ZIP_FLAGS)
 
 BITCOIN_INCLUDES += -I$(srcdir)/secp256k1/include
 BITCOIN_INCLUDES += -I$(srcdir)/univalue/include
@@ -372,7 +372,7 @@ if ENABLE_WALLET
 bitcoind_LDADD += libbitcoin_wallet.a
 endif
 
-bitcoind_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(JSONCPP_LIBS)
+bitcoind_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(JSONCPP_LIBS) $(ZMQ_LIBS) $(ZIP_LIBS)
 
 # added by Fan
 bitcoind_LDADD += $(LIBPOUW_SGX) $(LIBPOUW_SGX_LDFLAGS)
