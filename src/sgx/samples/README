@@ -8,21 +8,17 @@ Required Files in App folder:
 1. App.cpp - contains the functionality of the application, this file must take care of the enclave such as initializing the enclave and checking the status of the enclave, and this file must contain the implementation of Ocall functions.
 2. Other .cpp/.h files in this folder is for application development.
 
-Note: A Makefile is required to compile the above files.
+To compile with simulation mode:
+1. cmake -DSGX_MODE:STRING=SIM
+2. make
+To compile with SGX hardware enabled machine:
+1. cmake -DSGX_MODE:STRING=HW
+2. make
+
+To run the program:
+./app
 
 Specification:
 1. Ocall functions implementation should reside in the application; therefore, they are listed as untrusted in the Enclave.edl file.
 2. Ecall functinos implementation should reside in the enclave; therefore, they are listed as trusted in the Enclave.edl file.
-
-Testing:
-Run with simulation:
-1. make SGX_MODE=SIM
-2. ./app
-Run with SGX hardware enabled machine:
-1. make
-2. ./app
-
-
-
-
 
