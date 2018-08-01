@@ -42,7 +42,7 @@ set_target_properties(enclave PROPERTIES PREFIX "")
 target_link_libraries(enclave "${SGX_COMMON_CFLAGS} \
     -Wl,--no-undefined -nostdlib -nodefaultlibs -nostartfiles -L${SGX_LIBRARY_PATH} \
     -Wl,--whole-archive -l${TRTS_LIB_NAME} -Wl,--no-whole-archive \
-    -Wl,--start-group -lsgx_tstdc -lsgx_tstdcxx -lsgx_tcxx -l${CRYPTO_LIB_NAME} -lsgx_tprotected_fs -l${SERVICE_LIB_NAME} -Wl,--end-group \
+    -Wl,--start-group -lsgx_tstdc -lsgx_tstdcxx -lsgx_tcxx -lsgx_tkey_exchange -lsgx_tservice -l${CRYPTO_LIB_NAME} -lsgx_tprotected_fs -l${SERVICE_LIB_NAME} -lsgx_ukey_exchange -Wl,--end-group \
     -Wl,-Bstatic -Wl,-Bsymbolic -Wl,--no-undefined \
     -Wl,-pie,-eenclave_entry -Wl,--export-dynamic \
     -Wl,--defsym,__ImageBase=0")

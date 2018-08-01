@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
 set(SGX_SDK /opt/intel/sgxsdk)
-set(SGX_MODE HW)
+set(SGX_MODE "SIM" CACHE STRING "USER OPTION")
 set(SGX_ARCH x64)
 set(SGX_DEBUG 1)
 set(POUW_ROOT_DIR ${CMAKE_SOURCE_DIR})

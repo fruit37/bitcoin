@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
 set(SGX_SDK /opt/intel/sgxsdk)
+set(INCLUDE /usr/local/include)
 set(SGX_MODE HW)
 set(SGX_ARCH x64)
 set(SGX_DEBUG 1)

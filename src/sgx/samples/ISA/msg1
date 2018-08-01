@@ -1,0 +1,9 @@
+Client to Server:
+
+1. Call sgx_ra_get_msg1(Context returned by sgx_ra_init, ID of the enclave, sgx_ra_get_ga, ptr for returned context) inside the untrusted application.
+
+2. Send the msg1 to the service provider.
+
+Note: sgx_tkey_exchange.edl must be imported as the sgx_ra_get_ga is a variable of that library.
+
+

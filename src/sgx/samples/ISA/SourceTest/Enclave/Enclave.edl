@@ -1,0 +1,14 @@
+enclave {
+	from "print.edl" import *;
+	from "sgx_tae_service.edl" import *;
+	from "sgx_tkey_exchange.edl" import *;
+	include "sgx_key_exchange.h"
+	include "string.h"
+	trusted {
+		public void msg0([in] int* pse, [out] sgx_ra_context_t* ptr);
+		public void fakeServiceProvider([in] sgx_ra_msg1_t* msg, int type, [out] sgx_ra_msg2_t* msg2);
+	};
+	untrusted {
+		void requestSignRL([in] sgx_epid_group_id_t* gid, [in, out, string] char* respBody);
+	};
+};

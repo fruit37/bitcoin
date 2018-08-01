@@ -1,6 +1,6 @@
 enclave {
     trusted {
-	   public int findOccurString([in, string] char *str, [in, string] char* word, [out] int* number);
+	   public int findOccurString([in, string] char *str, [in, string] char* word);
     };
     //OCALL functions for output
     untrusted {

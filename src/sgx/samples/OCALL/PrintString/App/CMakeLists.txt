@@ -18,6 +18,10 @@ if (SGX_MODE STREQUAL HW)
     set(Urts_Library_Name sgx_urts)
     set(Trts_Library_Name sgx_trts)
     set(SERVICE_LIB_NAME sgx_tservice)
+else()
+    set(Urts_Library_Name sgx_urts_sim)
+    set(Trts_Library_Name sgx_trts_sim)
+    set(SERVICE_LIB_NAME sgx_tservice_sim)
 endif()
 
 include_directories(
@@ -36,6 +40,8 @@ endif()
 
 if(SGX_MODE STREQUAL HW)
     set(UAE_SERVICE_LIB sgx_uae_service)
+else()
+    set(UAE_SERVICE_LIB sgx_uae_service_sim)
 endif()
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SGX_COMMON_CFLAGS} -fPIC -Wno-attributes")

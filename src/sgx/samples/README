@@ -2,60 +2,25 @@ Required Files in Enclave folder:
 1. Enclave.config.xml - contains the configuration about the enclave.
 2. Enclave.cpp - contains the implementation of Ecall functions.
 3. Enclave.edl - contains the information about each function used by both the application and the enclave, including both Ecall and Ocall, residing in the trusted and untrusted sessions.
-4. Enclave_private.pem - contains unencrypted RSA, need to be stored securely.
+4. Enclave_private.pem - contains unencrypted RSA.
 
 Required Files in App folder:
 1. App.cpp - contains the functionality of the application, this file must take care of the enclave such as initializing the enclave and checking the status of the enclave, and this file must contain the implementation of Ocall functions.
 2. Other .cpp/.h files in this folder is for application development.
 
 Note: A Makefile is required to compile the above files.
-Generating the binary using Makefile, please refer to /OCALL/FindString
-Generating the binary using CMake, please refer to other files with CMakeLists.txt
 
 Specification:
 1. Ocall functions implementation should reside in the application; therefore, they are listed as untrusted in the Enclave.edl file.
 2. Ecall functinos implementation should reside in the enclave; therefore, they are listed as trusted in the Enclave.edl file.
 
-Testing with Make - execute following commands inside the application folder:
+Testing:
 Run with simulation:
 1. make SGX_MODE=SIM
 2. ./app
 Run with SGX hardware enabled machine:
 1. make
 2. ./app
-
-Testing with CMake - execute following commands inside the application folder:
-Run with simulation:
-1. Open the CMakeLists.txt file inside the application folder.
-2. Change to set(SGX_MODE SIM) rather than set(SGX_MODE HW).
-Run with SGX hardware enabled machine:
-1. Open the CMakeLists.txt file inside the application folder.
-2. Change to set(SGX_MODE HW) rather than set(SGX_MODE SIM).
-After changing the file and staying at the same directory:
-1. cmake .
-2. make
-3. ./app
-
-There are three CMakeLists.txt files inside each application folder.
-1. A CMakeList.txt inside the application folder indicates the specification of the SGX according to the user's computer.
-2. A CMakeList.txt inside the Enclave folder indicates the linked libraries used by the enclave and outputs the signed files (enclave.so, signed.so).
-3. A CMakeList.txt inside the App folder indicates the linked libraries used by the untrusted application side and outputs the executable file.
-Note: the application folder is different from the App folder as the App folder is a subfolder inside the application folder.
-
-Importing from existing library:
-To import a library to a new edl from an existing edl, this line (from "filename.edl" import *;) is needed inside the new enclave edl file.
-
-Suggestion:
-1. Please import sgx_utils.h to every project you are doing as it provides the basic functionality of initializing an enclave with existing token and signed file.
-2. Please check the status of the enclave after every ECALL to make sure the enclave is responding correctly. A simple way of checking the status is to check the return value of every ECALL as the return value is always the status of the enclave.
-3. A enclave id has to be passed in to the ECALL function when it is used. The type of the id is sgx_enclave_id_t.
-
-
-
-
-
-
-
 
 
 

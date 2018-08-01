@@ -1,0 +1,11 @@
+Client to Server:
+
+1. Call sgx_ra_proc_msg2(context returned by sgx_ra_init, enclave ID, sgx_ra_proc_msg2_trusted, sgx_ra_get_msg3_trusted, message received in msg2, length of msg2 in bytes, pointer of msg3, length of msg3 in bytes) to generate msg3.
+
+Note: sgx_ra_proc_msg2_trusted, sgx_ra_get_msg3_trusted are from libsgx_tservice.a so it has to be linked inside the CMakeFile. Also, we have to do the following inside the edl:
+include "sgx_tkey_exchange.h"
+from "sgx_tkey_exchange.edl" import *;
+
+2. After the calling, the function will return the msg3 which contains the quote of that particular enclave and other thing.
+
+3. Send the msg3 to the Server.

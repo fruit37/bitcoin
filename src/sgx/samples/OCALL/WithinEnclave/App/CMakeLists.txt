@@ -6,7 +6,7 @@ set(SOURCE_FILES
 
 add_custom_command(
         OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Enclave_u.c
-        COMMAND ${SGX_EDGER8R} --untrusted ${CMAKE_CURRENT_SOURCE_DIR}/../Enclave/Enclave.edl
+        COMMAND ${SGX_EDGER8R} --untrusted ${CMAKE_CURRENT_SOURCE_DIR}/../Enclave/Enclave.edl --untrusted ${CMAKE_CURRENT_SOURCE_DIR}/../Enclave/print.edl
         --search-path ${SGX_SDK}/include
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
@@ -14,14 +14,14 @@ add_custom_command(
 
 add_executable(app ${SOURCE_FILES})
 
-if (NOT SGX_MODE STREQUAL HW)
-    set(Urts_Library_Name sgx_urts_sim)
-    set(Trts_Library_Name sgx_trts_sim)
-    set(SERVICE_LIB_NAME sgx_tservice_sim)
-else()
+if (SGX_MODE STREQUAL HW)
     set(Urts_Library_Name sgx_urts)
     set(Trts_Library_Name sgx_trts)
     set(SERVICE_LIB_NAME sgx_tservice)
+else()
+    set(Urts_Library_Name sgx_urts_sim)
+    set(Trts_Library_Name sgx_trts_sim)
+    set(SERVICE_LIB_NAME sgx_tservice_sim)
 endif()
 
 include_directories(
@@ -48,8 +48,8 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SGX_COMMON_CFLAGS} -fPIC -Wno-attributes")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_C_FLAGS} -std=c++11")
 
 target_link_libraries(app "-Wl,-L${SGX_LIBRARY_PATH} \
-        -Wl,--start-group -l${Urts_Library_Name} -l${UAE_SERVICE_LIB} -Wl,--end-group \
-	-Wl,--defsym,__ImageBase=0 \
+        -Wl,--start-group -l${Urts_Library_Name} -l${UAE_SERVICE_LIB} \
+	-Wl,--whole-archive -lsgx_uprotected_fs -Wl,--no-whole-archive \
         -Wl,-lpthread \
         -Wl,-lboost_system \
         -Wl,-lboost_filesystem \

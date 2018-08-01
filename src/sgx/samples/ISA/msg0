@@ -1,0 +1,13 @@
+Client to Server:
+
+1. Execute an ECALL to enter the enclave.
+
+2. Call sgx_ra_init(ServiceProviderPublicKey, PSE?, ptr for returned context) inside the enclave.
+
+3. Return the result and the DHKE context to untrusted application.
+
+4. Call sgx_get_extended_epid_groud_id inside the untrusted application to get the GID.
+
+5. GID must be sent to the service provider.
+
+Note: ServiceProviderPublicKey should be in the same format as the sgx_ec256_public_t.

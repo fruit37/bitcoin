@@ -1,0 +1,31 @@
+Server to Client:
+
+1. After getting msg1 from the client, the service provider will generate a random EC key with P-256 curve using sgx_ecc256_create_key_pair function inside the sgx_tcrypto.h, and this key will be the Gb. In order to use sgx_ecc256_create_key_pair function, sgx_ecc256_open_context must be used beforehand.
+
+2. Compute the shared key between client and service provider using sgx_ecc256_compute_shared_dhkey function inside the sgx_tcrypto.h. It is used on the client's public key Ga and the service provider's private key Gb. 
+
+3. Convert the shared key to little-endian byte order by reversing its byte. The function used above seems like returning in little-endian.
+
+4. Perform an AES-128 CMAC with the shared key and a block of 0x00 bytes for the key using sgx_rijndael128_cmac_msg function.
+
+5. The result of the CMAC is the KDK.
+
+6. Perform an AES-128 CMAC with the KDK as the key and the block of these bytes:
+0x01 SMK 0x00 0x80 0x00 using sgx_rijndael128_cmac_msg function, this will be the SMK.
+
+7. Determine the quote type: 0x0 for unlinkable and 0x1 for linkable depending on the service provider.
+
+8. Set KDF_ID to 0x1.
+
+9. Calculate the ECDSA signature using sgx_ecdsa_sign function with bytes:
+Gbx Gby Gax Gay, and service provider's EC private key generated above.
+
+10. Calculate the AES-128 CMAC with the SMK as the key and the block of these bytes:
+Gb SPID Quote_Type KDF_ID SigSP.
+Note: SigSP is the ECDSA signature.
+
+11. Query IAS to obtain the SigRL for the GID using HTTP ias-api.
+
+12. Create ra_msg2_t using above information and return to Client.
+
+
