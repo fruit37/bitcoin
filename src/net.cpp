@@ -2632,6 +2632,7 @@ class ZmqConnector {
     private:
         std::string ip;
         std::string port;
+        std::string uuid;
         std::string result;
     public:
         ZmqConnector(std::string ip, std::string port) {
@@ -2662,7 +2663,24 @@ class ZmqConnector {
             socket.recv ( &reply, 0);
 
             //printf("%s", (char*)reply.data());
-            this->result = (char*)reply.data();
+            std::string pre_result = (char*)reply.data();
+
+            Json::Value ojson;
+            reader.parse(pre_result.c_str(), ojson);
+            
+            for (Json::Value::iterator it=ojson.begin(); it!=ojson.end();++it) {
+                if (it.key().asString() == "outcome") {
+                    printf("get empty task from dispatcher.\n");
+                    break;
+                } else if (it.key().asString() == "uuid") {
+                    this->uuid = it->asString();
+                    printf("my uuid: %s\n", this->uuid.c_str());
+                } else if (it.key().asString() == "content") {
+                    this->result = it->asString();
+                    //printf("my content: %s\n", this->result.c_str());
+                }
+            }
+            
         }
 
         std::string getResult() {

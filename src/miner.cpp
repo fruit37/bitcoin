@@ -383,7 +383,9 @@ void static BitcoinMiner(const CChainParams& chainparams)
             /* get computing task from dispatcher here for now.*/
             std::string result;
             GetTaskFromDispatcher(dispatcher_ip, dispatcher_port, result);
-            cout << "get task result from dispatcher:" << result << std::endl;
+            //cout << "get task result from dispatcher:" << result << std::endl;
+            if (result.empty()) continue;
+
             std::string strDec = DecodeBase64(result);
             ofstream write;
             write.open("download.zip", ios::out | ios::binary);
