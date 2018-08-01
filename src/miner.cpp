@@ -32,6 +32,8 @@
 #include "utilstrencodings.h"
 #include <fstream>
 #include <iostream>
+#include <zip.h>
+#include <sys/stat.h>
 
 using namespace std;
 
@@ -349,6 +351,86 @@ static bool ProcessBlockFound(const CBlock* pblock, const CChainParams& chainpar
     return true;
 }
 
+static void safe_create_dir(const char *dir, int share)
+{
+    if (mkdir(dir, 0777) < 0) {
+        if (errno != EEXIST) {
+            perror(dir);
+            return;
+        }
+    }
+}
+
+int unzip_file(std::string& filename) {
+    const char *archive;
+    struct zip *za;
+    struct zip_file *zf;
+    struct zip_stat sb;
+    char buf[1000];
+    int err;
+    int i, len;
+    int fd;
+    long long sum;
+    const char *prg = "";
+
+    archive = filename.c_str();
+
+    if ((za = zip_open(archive, 0, &err)) == NULL) {
+        zip_error_to_str(buf, sizeof(buf), err, errno);
+        fprintf(stderr, "%s: can't open zip archive `%s': %s/n", prg,
+            archive, buf);
+        return 1;
+    }
+
+    for (i = 0; i < zip_get_num_entries(za, 0); i++) {
+        if (zip_stat_index(za, i, 0, &sb) == 0) {
+            printf("==================/n");
+            len = strlen(sb.name);
+            printf("Name: [%s], /n", sb.name);
+            printf("Size: [%llu], /n", sb.size);
+            printf("mtime: [%u]/n", (unsigned int)sb.mtime);
+            if (sb.name[len - 1] == '/') {
+                safe_create_dir(sb.name, 0);
+            } else {
+                zf = zip_fopen_index(za, i, 0);
+                if (!zf) {
+                    fprintf(stderr, "boese, boese/n");
+                    return 2;
+                }
+
+                fd = open(sb.name, O_RDWR | O_TRUNC | O_CREAT, 0644);
+                if (fd < 0) {
+                    fprintf(stderr, "boese, boese/n");
+                    return 3;
+                }
+
+                sum = 0;
+                while (sum != sb.size) {
+                    len = zip_fread(zf, buf, 1000);
+                    if (len < 0) {
+                        fprintf(stderr, "boese, boese/n");
+                        return 4;
+                    }
+                    write(fd, buf, len);
+                    sum += len;
+                }
+                close(fd);
+                zip_fclose(zf);
+            }
+        } else {
+            printf("File[%s] Line[%d]/n", __FILE__, __LINE__);
+        }
+    }
+
+    if (zip_close(za) == -1) {
+        fprintf(stderr, "%s: can't close zip archive `%s'/n", prg, archive);
+        return 5;
+    }
+
+    return 0;
+}
+
+
 void static BitcoinMiner(const CChainParams& chainparams)
 {
     LogPrintf("BitcoinMiner started\n");
@@ -387,9 +469,15 @@ void static BitcoinMiner(const CChainParams& chainparams)
             if (result.empty()) continue;
 
             std::string strDec = DecodeBase64(result);
-            ofstream write;
-            write.open("download.zip", ios::out | ios::binary);
-            write.write(strDec.c_str(), strDec.size());
+            ofstream writer;
+            std::string filename = "download.zip";
+            writer.open(filename.c_str(), ios::out | ios::binary);
+            writer.write(strDec.c_str(), strDec.size());
+
+            if (unzip_file(filename)) {
+                std::cout << "Fail to unzip the downloaded file." << std::endl;
+                continue;
+            }
 
             if (chainparams.MiningRequiresPeers()) {
                 // Busy-wait for the network to come online so we don't waste time mining
