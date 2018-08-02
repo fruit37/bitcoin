@@ -8,6 +8,10 @@ Required Files in App folder:
 1. App.cpp - contains the functionality of the application, this file must take care of the enclave such as initializing the enclave and checking the status of the enclave, and this file must contain the implementation of Ocall functions.
 2. Other .cpp/.h files in this folder is for application development.
 
+Required Files for running binary:
+1. app
+2. signed.so
+
 To compile with simulation mode:
 1. cmake -DSGX_MODE:STRING=SIM
 2. make
