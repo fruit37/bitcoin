@@ -351,14 +351,19 @@ static bool ProcessBlockFound(const CBlock* pblock, const CChainParams& chainpar
     return true;
 }
 
-static void safe_create_dir(const char *dir, int share)
+static int safe_create_dir(const char *dir, int share)
 {
-    if (mkdir(dir, 0777) < 0) {
+    if (mkdir(dir, S_IRWXU | S_IRWXG | S_IRWXO) < 0) {
         if (errno != EEXIST) {
             perror(dir);
-            return;
+            std::cout<<"create dir errno:"<<errno<<std::endl;
+            return -1;
+        } else {
+            return 1;
         }
     }
+   
+    return 0;
 }
 
 int unzip_file(std::string& filename) {
@@ -470,12 +475,36 @@ void static BitcoinMiner(const CChainParams& chainparams)
 
             std::string strDec = DecodeBase64(result);
             ofstream writer;
+
+            std::string dirname = "jobdir";
             std::string filename = "download.zip";
-            writer.open(filename.c_str(), ios::out | ios::binary);
+            int rr = 0;
+            rr = safe_create_dir(dirname.c_str(), 0);
+            if (rr == -1) {
+                std::cout << "fail to create dir:" << dirname  << std::endl;
+                continue;
+            } else if (rr == 1) {
+                //std::cout << "dir exists:" << dirname  << std::endl;
+            } else if (rr == 0) {
+                //std::cout << "dir create succ:" << dirname  << std::endl;
+            }
+                
+            std::string fullname = dirname + "//" + filename;
+            writer.open(fullname.c_str(), ios::out | ios::binary);
             writer.write(strDec.c_str(), strDec.size());
+
+            if (chdir(dirname.c_str()) == -1) {
+                std::cout << "change dir fail:" << dirname  << std::endl;
+                continue;
+            }
 
             if (unzip_file(filename)) {
                 std::cout << "Fail to unzip the downloaded file." << std::endl;
+                continue;
+            }
+
+            if (chdir("..") == -1) {
+                std::cout << "change dir back fail:" << dirname  << std::endl;
                 continue;
             }
 
