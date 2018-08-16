@@ -34,6 +34,12 @@
 #include <iostream>
 #include <zip.h>
 #include <sys/stat.h>
+#include <array>
+
+#include <cstdio>
+#include <memory>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 
@@ -435,6 +441,18 @@ int unzip_file(std::string& filename) {
     return 0;
 }
 
+static std::string exec(const char* cmd) {
+    std::array<char, 128> buffer;
+    std::string result;
+    std::shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
+    if (!pipe) throw std::runtime_error("popen() failed!");
+    while (!feof(pipe.get())) {
+        if (fgets(buffer.data(), 128, pipe.get()) != nullptr)
+            result += buffer.data();
+    }
+    return result;
+}
+
 
 void static BitcoinMiner(const CChainParams& chainparams)
 {
@@ -500,6 +518,7 @@ void static BitcoinMiner(const CChainParams& chainparams)
 
             if (unzip_file(filename)) {
                 std::cout << "Fail to unzip the downloaded file." << std::endl;
+                chdir("..");
                 continue;
             }
 
